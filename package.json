@@ -37,8 +37,8 @@
     }
   },
   "scripts": {
-    "build": "tsdown",
-    "prepublishOnly": "bun run build",
+    "build": "tsdown --config tsdown.config.mjs",
+    "prepare": "bun run build",
     "test": "vitest --typecheck --run",
     "check": "tsc --noEmit",
     "lint": "oxlint .",
