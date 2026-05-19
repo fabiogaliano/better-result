@@ -535,45 +535,47 @@ export class Err<T, E> {
   }
 
   /**
-   * Attempts to recover from Err into the same success type.
+   * Attempts to recover from Err into a new Result.
    *
+   * @template A Recovered success type.
    * @template E2 New error type.
-   * @param fn Recovery function returning Result with the same success type.
+   * @param fn Recovery function returning a Result.
    * @returns Result from fn.
    * @throws {Panic} If fn throws.
    *
    * @example
    * err<number, string>("missing").tryRecover(e => e === "missing" ? ok(0) : err(new Error(e))) // Ok(0)
    */
-  tryRecover<E2>(this: Err<T, E>, fn: (e: E) => Result<NoInfer<T>, E2>): Result<T, E2>;
+  tryRecover<A, E2>(this: Err<T, E>, fn: (e: E) => Result<A, E2>): Result<A, E2>;
   tryRecover<E2, R extends AnyResult = Result<T, E>>(
     this: R,
     fn: (e: InferErr<R>) => Result<NoInfer<InferSuccess<R>>, E2>,
   ): TryRecoverReturn<R, E2>;
-  tryRecover<E2>(fn: (e: E) => Result<NoInfer<T>, E2>): Result<T, E2> {
+  tryRecover<A, E2>(fn: (e: E) => Result<A, E2>): Result<A, E2> {
     return tryOrPanic(() => fn(this.error), "tryRecover callback threw");
   }
 
   /**
-   * Attempts to recover from Err into the same success type asynchronously.
+   * Attempts to recover from Err into a new Result asynchronously.
    *
+   * @template A Recovered success type.
    * @template E2 New error type.
-   * @param fn Async recovery function returning Result with the same success type.
+   * @param fn Async recovery function returning a Result.
    * @returns Promise of Result from fn.
    * @throws {Panic} If fn throws synchronously or rejects.
    *
    * @example
    * await err<number, string>("missing").tryRecoverAsync(async e => e === "missing" ? ok(0) : err(new Error(e))) // Ok(0)
    */
-  tryRecoverAsync<E2>(
+  tryRecoverAsync<A, E2>(
     this: Err<T, E>,
-    fn: (e: E) => Promise<Result<NoInfer<T>, E2>>,
-  ): Promise<Result<T, E2>>;
+    fn: (e: E) => Promise<Result<A, E2>>,
+  ): Promise<Result<A, E2>>;
   tryRecoverAsync<E2, R extends AnyResult = Result<T, E>>(
     this: R,
     fn: (e: InferErr<R>) => Promise<Result<NoInfer<InferSuccess<R>>, E2>>,
   ): Promise<TryRecoverReturn<R, E2>>;
-  tryRecoverAsync<E2>(fn: (e: E) => Promise<Result<NoInfer<T>, E2>>): Promise<Result<T, E2>> {
+  tryRecoverAsync<A, E2>(fn: (e: E) => Promise<Result<A, E2>>): Promise<Result<A, E2>> {
     return tryOrPanicAsync(() => fn(this.error), "tryRecoverAsync callback threw");
   }
 

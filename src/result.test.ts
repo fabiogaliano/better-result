@@ -2245,12 +2245,12 @@ describe("Type Inference", () => {
       expect(dataLastOk.unwrap()).toBe(0);
     });
 
-    it("does not allow the success channel to change", () => {
+    it("keeps Result-union recovery success type fixed while concrete Err can recover to any success type", () => {
       const r: Result<string, ErrorA> = Result.err(new ErrorA());
 
       const compileTimeOnly = () => {
-        // @ts-expect-error tryRecover matches Gleam semantics: it may change E, not T.
-        r.tryRecover(() => Result.ok(123));
+        const concreteErrRecovery = r.tryRecover(() => Result.ok(123));
+        expectTypeOf(concreteErrRecovery).toEqualTypeOf<Result<number, never>>();
 
         // @ts-expect-error data-first tryRecover may not map the success channel.
         Result.tryRecover(r, () => Result.ok(123));
@@ -2330,12 +2330,12 @@ describe("Type Inference", () => {
       expect(dataLastOk.unwrap()).toBe(0);
     });
 
-    it("does not allow the success channel to change", async () => {
+    it("keeps Result-union recovery success type fixed while concrete Err can recover to any success type", async () => {
       const r: Result<string, ErrorA> = Result.err(new ErrorA());
 
       const compileTimeOnly = () => {
-        // @ts-expect-error tryRecoverAsync matches Gleam semantics: it may change E, not T.
-        r.tryRecoverAsync(async () => Result.ok(123));
+        const concreteErrRecovery = r.tryRecoverAsync(async () => Result.ok(123));
+        expectTypeOf(concreteErrRecovery).toEqualTypeOf<Promise<Result<number, never>>>();
 
         // @ts-expect-error data-first tryRecoverAsync may not map the success channel.
         Result.tryRecoverAsync(r, async () => Result.ok(123));
